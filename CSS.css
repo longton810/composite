@@ -1,0 +1,682 @@
+* { font-family:Arial,sans-serif; }
+body { font-family:Arial,sans-serif; padding:25px; background:#fafafa; color:#222; }
+button,input,textarea,select { font-family:Arial,sans-serif; }
+h2 { margin-top:25px; }
+hr { margin-top:25px; margin-bottom:20px; border:none; border-top:1px solid #bbb; }
+.odontogram-grid { position:relative; display:inline-block; padding:10px 0; }
+.dentition-canvas::after { content:""; position:absolute; top:0; bottom:55px; left:50%; width:2px; background:#555; transform:translateX(-50%); pointer-events:none; z-index:0; }
+.quadrant-horizontal-line { width:100%; height:2px; background:#555; margin:5px 0 12px 0; }
+.arch { display:flex; gap:8px; align-items:flex-start; overflow-x:auto; padding:10px 5px; margin-bottom:8px; }
+.tooth { width:68px; min-width:68px; text-align:center; position:relative; z-index:1; }
+.tooth.midline { margin-right:12px; }
+.tooth-diagram { width:68px; height:105px; display:block; margin:auto; overflow:visible; }
+.surface { fill:white; stroke:#17324d; stroke-width:2; cursor:pointer; transition:fill 0.15s,opacity 0.15s; }
+.surface:hover { fill:#eeeeee; }
+.surface.selected { fill:#ffd54f !important; }
+.tooth-diagram text { font-family:Arial,sans-serif; font-size:15px; font-weight:bold; text-anchor:middle; pointer-events:none; user-select:none; }
+.cervical-surface { fill:white; stroke:#17324d; stroke-width:2; cursor:pointer; }
+.cervical-label { font-family:Arial,sans-serif; font-size:17px !important; font-weight:bold; text-anchor:middle; dominant-baseline:middle; pointer-events:none; }
+.tooth-number { display:inline-flex; align-items:center; justify-content:center; min-width:30px; min-height:26px; padding:2px 4px; box-sizing:border-box; font-family:Arial,sans-serif; font-weight:bold; cursor:pointer; border-radius:4px; }
+.tooth-number:hover { background:#eeeeee; }
+.tooth-number.selected { background:#ffd54f; }
+.position-display { min-height:16px; margin-top:3px; font-family:Arial,sans-serif; font-size:10px; font-weight:bold; line-height:1.25; text-align:center; color:#555; }
+.position-item { display:block; white-space:nowrap; }
+.main-odontogram-controls { width:100%; display:flex; justify-content:center; align-items:center; gap:8px; margin-top:5px; position:relative; z-index:5; }
+#missingMain { padding:6px 15px; white-space:nowrap; }
+#changeAge { padding:6px 15px; background:white; color:#333; border:1px solid #777; border-radius:999px; font-family:Arial,sans-serif; font-size:13px; font-weight:700; line-height:1.15; white-space:nowrap; cursor:pointer; }
+#changeAge:hover { background:#eeeeee; }
+.finding-section { max-width:1100px; }
+.finding-row { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+.finding-label { width:105px; font-weight:bold; }
+.finding { padding:6px 15px; margin:2px; border:none; border-radius:999px; font-family:Arial,sans-serif; font-size:13px; font-weight:normal; line-height:1.15; cursor:pointer; transition:transform 0.12s ease,box-shadow 0.12s ease,opacity 0.12s ease; }
+.btn-featured { padding:9px 22.5px; font-size:19.5px; }
+.finding:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 2px 5px rgba(0,0,0,0.20); }
+.finding:active:not(:disabled) { transform:translateY(0); }
+.finding:disabled { opacity:0.4; cursor:not-allowed; }
+
+.btn-stain { background:#795548; color:white; }
+.btn-caries { background:#e53935; color:white; }
+.btn-incipient { background:#ef9a9a; color:white; }
+.btn-recurrent { background:#b71c19; color:white; }
+.btn-gross { background:#7D1702; color:white; }
+.btn-composite { background:#42a5f5; color:white; }
+.btn-amalgam { background:#607d8b; color:white; }
+.btn-sealant { background:#26a69a; color:white; }
+.btn-irm { background:#ab47bc; color:white; }
+.btn-wear { background:#ffb74d; color:#222; }
+.btn-abfraction { background:#ff8a65; color:#222; }
+.btn-erosion { background:#fff176; color:#222; }
+.btn-crack { background:#fff3e0; color:#d84315; border:2px solid #d84315; }
+.btn-broken { background:#ff7043; color:white; }
+.btn-zirconia { background:#ab47bc; color:white; }
+.btn-pfm { background:#5c6bc0; color:white; }
+.btn-metal { background:#607d8b; color:white; }
+.btn-bridge { background:#ffa726; color:#222; }
+.btn-rct,.btn-post-core { background:#66bb6a; color:white; }
+.btn-implant { background:#26a69a; color:white; }
+.btn-root-tip { background:#9e9e9e; color:white; }
+.btn-missing { background:#e0e0e0; color:#333; border:1px solid #777; }
+.position-button { background:#78909c; color:white; }
+
+.surface.stain { fill:#795548; }
+.surface.caries { fill:#e53935; }
+.surface.incipient-caries { fill:#ef9a9a; }
+.surface.recurrent-caries { fill:#c62828; }
+.surface.gross-caries { fill:#7f0000; }
+.surface.composite { fill:#2196f3; }
+.surface.amalgam { fill:#757575; }
+.surface.sealant { fill:#26a69a; }
+.surface.irm { fill:#ba68c8; }
+.surface.wear { fill:#ffb74d; }
+.surface.abfraction { fill:#ff8a65; }
+.surface.erosion { fill:#fff176; }
+.surface.crack-line { fill:#fff3e0; stroke:#d84315; stroke-width:5; }
+.surface.broken { fill:#ff7043; stroke:#bf360c; stroke-width:4; }
+
+.tooth-diagram.zirconia-crown { outline:5px solid #ab47bc; outline-offset:2px; }
+.tooth-diagram.pfm-crown { outline:5px solid #5c6bc0; outline-offset:2px; }
+.tooth-diagram.metal-crown { outline:5px solid #616161; outline-offset:2px; }
+.tooth-diagram.bridge { outline:5px solid #ffa726; outline-offset:2px; }
+.tooth-diagram.rct { outline:5px solid #66bb6a; outline-offset:2px; }
+.tooth-diagram.post-core { outline:5px double #66bb6a; outline-offset:2px; }
+.tooth-diagram.implant { outline:5px solid #26a69a; outline-offset:2px; }
+.tooth-diagram.missing { visibility:hidden; }
+.tooth-diagram.root-tip .surface:not(.cervical-surface) { display:none; }
+.tooth-diagram.root-tip text:not(.cervical-label) { display:none; }
+.tooth-diagram.root-tip .cervical-surface { display:block; fill:#bdbdbd; stroke:#555; stroke-width:2; }
+.tooth-diagram.root-tip .cervical-label { display:block; }
+
+#output { width:700px; max-width:90%; min-height:130px; border:1px solid #999; background:white; padding:12px; margin-bottom:10px; }
+.chart-entry { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:7px 8px; border-bottom:1px solid #eeeeee; }
+.chart-text { flex:1; min-height:24px; padding:3px 5px; border-radius:4px; font-family:Arial,sans-serif; cursor:text; }
+.chart-text:hover { background:#f5f5f5; }
+.chart-text:focus { background:white; outline:2px solid #90caf9; }
+.chart-mobility { color:#e53935; font-weight:bold; }
+.delete-chart-line { flex-shrink:0; width:26px; height:26px; padding:0; border:1px solid #c62828; border-radius:4px; background:white; color:#c62828; font-family:Arial,sans-serif; font-size:18px; font-weight:bold; line-height:22px; cursor:pointer; }
+.delete-chart-line:hover { background:#c62828; color:white; }
+.chart-controls button { padding:6px 14px; margin-right:5px; border:1px solid #777; border-radius:999px; background:white; font-family:Arial,sans-serif; font-size:13px; font-weight:700; cursor:pointer; }
+.chart-controls button:hover { background:#eeeeee; }
+#copyMessage { margin-top:8px; min-height:20px; font-family:Arial,sans-serif; font-weight:bold; }
+
+.tooth[hidden] { display:block !important; visibility:hidden; pointer-events:none; }
+.dentition-controls { display:flex; justify-content:center; gap:8px; position:relative; z-index:2; margin-bottom:12px; }
+.dentition-button { padding:8px 14px; border:1px solid rgba(100,116,139,.35); border-radius:999px; background:rgba(255,255,255,.8); color:#334155; font:normal 13px Arial,sans-serif; cursor:pointer; box-shadow:0 3px 8px rgba(15,23,42,.08); backdrop-filter:blur(12px); }
+.dentition-button.active { background:#2563eb; color:white; }
+.dentition-button:hover { filter:brightness(.96); }
+.dentition-button:focus-visible { outline:2px solid #2563eb; outline-offset:3px; }
+.dentition-canvas::after { top:50px; }
+.finding-label { min-width:145px; }
+.btn-decalcified { background:#e2e8f0; color:#334155; border:1px solid #94a3b8; }
+.surface.decalcified { fill:#e2e8f0; stroke:#94a3b8; stroke-dasharray:3 2; }
+.btn-parl { background:#7c3aed; color:white; }
+.btn-paro { background:#a16207; color:white; }
+.btn-ankylosis { background:#475569; color:white; }
+.tooth-diagram.parl { outline:3px dashed #7c3aed; outline-offset:3px; }
+.tooth-diagram.paro { outline:3px dotted #a16207; outline-offset:3px; }
+.tooth-diagram.ankylosis { outline:4px double #475569; outline-offset:3px; }
+.tooth[hidden] .tooth-number { visibility:visible; pointer-events:auto; opacity:0.45; filter:blur(0.6px); }
+
+.clinical-panels { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:24px; max-width:1450px; align-items:start; }
+.clinical-panel { min-width:0; }
+.clinical-panels .finding-section,.treatment-section { padding:18px; border:1px solid rgba(148,163,184,.35); border-radius:18px; background:rgba(255,255,255,.7); box-shadow:0 8px 24px rgba(15,23,42,.06); backdrop-filter:blur(16px); }
+.treatment { padding:6px 15px; margin:2px; border:none; border-radius:999px; font:normal 13px Arial,sans-serif; line-height:1.15; cursor:pointer; transition:transform .12s,box-shadow .12s; }
+.treatment:hover:not(:disabled) { transform:translateY(-1px); box-shadow:0 2px 5px rgba(0,0,0,.2); }
+.treatment:disabled { opacity:.4; cursor:not-allowed; }
+.btn-watch { background:#64748b; color:white; }
+.btn-sdf { background:#334155; color:white; }
+.btn-cbu { background:#0284c7; color:white; }
+.btn-rmgi { background:#0891b2; color:white; }
+.btn-extraction { background:#dc2626; color:white; }
+.btn-lengthening { background:#d97706; color:white; }
+
+@media (max-width:1000px) {
+  .clinical-panels { grid-template-columns:1fr; gap:8px; }
+}
+
+.btn-ssc { background:#78909c; color:white; }
+.tooth-diagram.ssc { outline:5px solid #78909c; outline-offset:2px; }
+.extraction-cross { display:none; fill:none; stroke:#e53935; stroke-width:7; stroke-linecap:round; pointer-events:none; }
+.tooth-diagram.extraction-planned .extraction-cross { display:block; }
+
+:root { --glass:rgba(255,255,255,.66); --glass-border:rgba(255,255,255,.9); --ink:#20334b; --muted:#62748b; --panel-shadow:0 16px 45px rgba(39,73,112,.10),inset 0 1px 0 rgba(255,255,255,.95); }
+body { margin:0; padding:28px; min-height:100vh; color:var(--ink); background:radial-gradient(ellipse at 12% 0%,rgba(99,164,255,.25),transparent 45%),radial-gradient(ellipse at 95% 35%,rgba(167,139,250,.18),transparent 42%),radial-gradient(ellipse at 35% 100%,rgba(94,234,212,.17),transparent 45%),linear-gradient(135deg,#f5f9ff,#eaf1fb); background-attachment:fixed; }
+h2 { margin:24px 0 14px; font-size:19px; letter-spacing:-.35px; color:var(--ink); }
+hr { height:1px; border:0; margin:25px 0 10px; background:linear-gradient(90deg,rgba(94,116,145,.28),transparent); }
+.odontogram-grid { padding:18px 18px 16px; border:1px solid var(--glass-border); border-radius:25px; background:var(--glass); box-shadow:var(--panel-shadow); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); }
+.dentition-canvas::after { top:68px; bottom:66px; width:1px; background:linear-gradient(transparent,rgba(74,101,132,.65),transparent); }
+.quadrant-horizontal-line { height:1px; background:linear-gradient(90deg,transparent,rgba(74,101,132,.65),transparent); }
+.arch { padding-top:12px; padding-bottom:12px; }
+.tooth-diagram { filter:drop-shadow(0 3px 3px rgba(37,67,105,.09)); }
+.surface { fill:rgba(255,255,255,.95); stroke:#496480; stroke-width:1.7; transition:fill .15s,stroke .15s; }
+.surface:hover { stroke:#2563eb; }
+.cervical-surface { fill:rgba(255,255,255,.95); stroke:#496480; stroke-width:1.7; }
+.surface.selected { fill:#ffe38a !important; stroke:#d99b16; }
+.tooth-diagram text { fill:#30465e; font-weight:600; }
+.tooth-number { margin-top:4px; border:1px solid transparent; border-radius:9px; font-size:13px; color:var(--ink); transition:background .15s,box-shadow .15s; }
+.tooth-number:hover { background:rgba(255,255,255,.85); border-color:rgba(118,145,175,.25); box-shadow:0 3px 8px rgba(36,62,96,.08); }
+.tooth-number.selected { background:#ffe38a; border-color:#e3bd52; color:#604816; box-shadow:0 3px 9px rgba(215,168,41,.18); }
+.position-display { color:var(--muted); font-weight:normal; line-height:1.35; }
+.dentition-controls { gap:6px; margin-bottom:12px; }
+.dentition-button,#changeAge,#missingMain,.chart-controls button { padding:7px 15px; border:1px solid rgba(135,157,185,.30); border-radius:999px; background:rgba(255,255,255,.72); color:var(--ink); font-size:13px; font-weight:normal; box-shadow:inset 0 1px 0 rgba(255,255,255,.95),0 3px 9px rgba(44,75,114,.06); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); transition:background .15s,box-shadow .15s,transform .15s; }
+.dentition-button.active { color:white; background:linear-gradient(135deg,#4c91f6,#2563eb); border-color:rgba(37,99,235,.45); box-shadow:0 4px 12px rgba(37,99,235,.22); }
+.dentition-button:hover,#changeAge:hover,#missingMain:hover:not(:disabled),.chart-controls button:hover { transform:translateY(-1px); box-shadow:0 5px 12px rgba(44,75,114,.12); }
+.main-odontogram-controls { gap:9px; margin-top:10px; }
+.clinical-panels { gap:22px; }
+.clinical-panels .finding-section,.treatment-section,#output { border:1px solid var(--glass-border); border-radius:22px; background:var(--glass); box-shadow:var(--panel-shadow); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); }
+.clinical-panels .finding-section,.treatment-section { padding:20px; }
+.finding-row { gap:6px; margin-bottom:0; padding:10px 0; border-bottom:1px solid rgba(118,145,175,.13); }
+.finding-row:last-child { border-bottom:0; }
+.finding-label { width:145px; min-width:145px; font-size:12px; color:var(--muted); font-weight:600; }
+.finding,.treatment { border:1px solid rgba(255,255,255,.28); background-image:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,0)); border-radius:999px; font-weight:normal; box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 7px rgba(37,61,94,.09); transition:transform .15s,box-shadow .15s; }
+.finding:hover:not(:disabled),.treatment:hover:not(:disabled) { transform:translateY(-2px); box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 6px 12px rgba(37,61,94,.16); }
+.finding:active:not(:disabled),.treatment:active:not(:disabled) { transform:translateY(0); }
+.finding:disabled,.treatment:disabled { opacity:.4; box-shadow:none; }
+.position-button { background-color:#dbe3ec; color:#44576c; border-color:rgba(118,145,175,.2); }
+.position-button[data-name="mobility"] { color:#c92538; }
+#output { padding:15px; min-height:130px; }
+.chart-entry { padding:8px 6px; border-bottom-color:rgba(118,145,175,.16); border-radius:8px; }
+.chart-entry:hover { background:rgba(255,255,255,.42); }
+.chart-text { font-size:14px; line-height:1.5; border-radius:6px; }
+.chart-text:hover { background:rgba(255,255,255,.48); }
+.chart-text:focus { background:rgba(255,255,255,.85); outline:2px solid rgba(59,130,246,.4); }
+.delete-chart-line { border-radius:8px; background:rgba(255,255,255,.6); border-color:rgba(220,38,38,.3); color:#d12b3e; }
+.delete-chart-line:hover { background:#d12b3e; color:white; }
+#copyMessage { color:#16815e; font-size:13px; }
+button:focus-visible,.tooth-number:focus-visible { outline:2px solid #2563eb; outline-offset:3px; }
+
+@media (max-width:1000px) {
+  body { padding:16px; }
+  .clinical-panels { gap:8px; }
+}
+
+@media (prefers-reduced-motion:reduce) {
+  .finding,.treatment,.dentition-button,.tooth-number,.surface { transition:none; }
+}
+
+.finding.btn-featured { padding:6px 15px; font-size:13px; }
+.surface.composite { fill:#42a5f5; }
+.surface.amalgam { fill:#607d8b; }
+.surface.irm { fill:#ab47bc; }
+.crown-outline { display:none; fill:none; stroke-width:5; pointer-events:none; }
+.tooth-diagram.has-crown-outline .crown-outline { display:block; }
+.tooth-diagram.root-tip .crown-outline { display:none; }
+.tooth-diagram.ssc,.tooth-diagram.zirconia-crown,.tooth-diagram.pfm-crown,.tooth-diagram.metal-crown,.tooth-diagram.bridge,.tooth-diagram.implant,.tooth-diagram.parl,.tooth-diagram.paro,.tooth-diagram.ankylosis { outline:none; }
+.root-markers { display:flex; justify-content:center; gap:4px; min-height:14px; margin-top:4px; }
+.root-marker { display:inline-block; width:12px; height:12px; border-radius:50%; box-shadow:0 1px 3px rgba(15,23,42,.15); }
+.implant-symbol { display:none; stroke:#26a69a; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+.tooth-diagram.has-implant-symbol .implant-symbol { display:block; }
+.tooth-diagram.has-implant-symbol .cervical-surface,.tooth-diagram.has-implant-symbol .cervical-label { display:none; }
+.endo-symbol { display:none; pointer-events:none; }
+.endo-root { fill:rgba(255,255,255,.92); stroke:#496480; stroke-width:2; stroke-linejoin:round; }
+.endo-canal { fill:none; stroke:#66bb6a; stroke-width:5; stroke-linecap:round; stroke-linejoin:round; }
+.tooth-diagram.has-endo-symbol .endo-symbol { display:block; }
+.tooth-diagram.has-endo-symbol .cervical-surface,.tooth-diagram.has-endo-symbol .cervical-label { display:none; }
+.tooth-diagram.rct { outline:none; }
+.tooth-diagram.has-implant-symbol .endo-symbol { display:none; }
+.tooth-diagram { height:116.35px; }
+.lengthening-arrows { display:none; fill:none; stroke:#eab308; stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round; pointer-events:none; }
+.tooth-diagram.has-lengthening-arrows .lengthening-arrows { display:block; }
+.pulpotomy-symbol,.post-core-symbol { display:none; pointer-events:none; }
+.pulp-chamber,.core-block { fill:#66bb6a; }
+.post-shaft { fill:none; stroke:#66bb6a; stroke-width:8; stroke-linecap:round; }
+.post-canal { display:none; fill:none; stroke:#66bb6a; stroke-width:5; stroke-linecap:round; }
+.tooth-diagram.has-pulpotomy-symbol .pulpotomy-symbol,.tooth-diagram.has-post-core-symbol .post-core-symbol { display:block; }
+.tooth-diagram.has-pulpotomy-symbol .cervical-surface,.tooth-diagram.has-pulpotomy-symbol .cervical-label,.tooth-diagram.has-post-core-symbol .cervical-surface,.tooth-diagram.has-post-core-symbol .cervical-label { display:none; }
+.tooth-diagram.post-core { outline:none; }
+.tooth-diagram.has-endo-symbol .pulpotomy-symbol,.tooth-diagram.has-post-core-symbol .pulpotomy-symbol,.tooth-diagram.has-post-core-symbol .endo-symbol { display:none; }
+.tooth-diagram.has-post-core-symbol.has-endo-symbol .post-canal { display:block; }
+.tooth-diagram.has-implant-symbol .pulpotomy-symbol,.tooth-diagram.has-implant-symbol .post-core-symbol { display:none; }
+
+.arch { position:relative; }
+.bridge-overlay { position:absolute; top:0; left:0; z-index:3; pointer-events:none; overflow:visible; }
+.watch-marker { display:none; justify-content:center; margin-top:2px; }
+.tooth.has-watch-marker .watch-marker { display:flex; }
+.watch-marker svg { width:20px; height:13px; }
+.watch-marker path { fill:rgba(255,255,255,.75); stroke:#64748b; stroke-width:2; }
+.watch-marker circle { fill:#64748b; }
+.endo-coronal-network { display:none; pointer-events:none; }
+.tooth-diagram.has-endo-coronal .endo-coronal-network { display:block; }
+.endo-coronal-network circle { fill:var(--endo-color,#66bb6a); stroke:none; }
+.endo-coronal-links { fill:none; stroke:var(--endo-color,#66bb6a); stroke-width:7; stroke-linecap:round; }
+.tooth-diagram.root-tip .endo-coronal-network { display:none; }
+#autosaveMessage { margin-top:6px; font-size:12px; color:#62748b; }
+
+.clear-all-area { margin-top:80px; padding-top:24px; border-top:1px solid rgba(120,140,160,.25); display:flex; justify-content:flex-end; }
+#clearAll,#confirmClearAll { background:#b42332; color:white; border:1px solid #991b2a; border-radius:10px; padding:10px 18px; cursor:pointer; }
+#clearAllDialog { width:min(420px,calc(100vw - 64px)); border:1px solid rgba(255,255,255,.7); border-radius:18px; padding:24px; color:#25364a; background:rgba(248,251,255,.96); box-shadow:0 24px 80px rgba(20,35,55,.3); }
+#clearAllDialog::backdrop { background:rgba(15,25,40,.45); backdrop-filter:blur(5px); }
+#clearAllDialog h3 { margin-top:0; }
+#clearAllDialog p { line-height:1.5; }
+.clear-all-actions { display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; margin-top:24px; }
+#cancelClearAll { border:1px solid #bbc6d3; border-radius:10px; padding:10px 18px; background:white; color:#25364a; cursor:pointer; }
+
+.position-display { display:none; }
+.tooth-number.has-mobility { position:relative; padding-left:14px; padding-right:14px; }
+.tooth-number.has-mobility::before,.tooth-number.has-mobility::after { position:absolute; top:50%; transform:translateY(-50%); color:#e53935; font-size:14px; font-weight:bold; line-height:1; pointer-events:none; }
+.tooth-number.has-mobility::before { content:"←"; left:1px; }
+.tooth-number.has-mobility::after { content:"→"; right:1px; }
+
+.dentition-canvas { position:relative; }
+.odontogram-findings { position:relative; z-index:1; margin-top:12px; }
+.odontogram-findings h2 { margin:12px 0 8px; }
+.odontogram-findings .finding-section { max-width:none; }
+.clinical-panels.treatment-panels { grid-template-columns:minmax(0,1fr); margin-top:12px; }
+.finding-row { border-bottom:none; }
+.tooth-number { margin-top:-14px; }
+.tooth-number.has-mobility::before,.tooth-number.has-mobility::after { font-size:13px; font-weight:900; -webkit-text-stroke:0.5px #e53935; transform:translateY(-50%) scaleX(0.7); }
+
+
+
+.odontogram-grid {
+  padding-top: 56px;
+}
+
+
+.dentition-controls {
+  position: absolute;
+  top: 12px;
+  left: 18px;
+  justify-content: flex-start;
+  gap: 6px;
+  margin: 0;
+  z-index: 10;
+}
+
+
+.main-odontogram-controls {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  gap: 6px;
+  margin: 0;
+  z-index: 10;
+}
+
+
+.finding-section .finding-row,
+.treatment-section .finding-row {
+  padding: 4px 0;
+  margin-bottom: 0;
+  gap: 4px;
+}
+
+
+.finding-section .finding,
+.finding-section .finding.btn-featured,
+.treatment-section .treatment {
+  padding: 4px 9px;
+  margin: 1px;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+
+@media (max-width: 640px) {
+  .odontogram-grid {
+    padding-top: 96px;
+  }
+
+  .odontogram-grid::after {
+    top: 108px;
+  }
+
+  .main-odontogram-controls {
+    top: 52px;
+  }
+}
+
+.finding-row .finding-label {
+  width: auto;
+  min-width: 0;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.finding-section .finding-row,
+.treatment-section .finding-row {
+  gap: 3px;
+}
+
+.clinical-panels {
+  grid-template-columns: 1fr;
+}
+
+.finding-section,
+.treatment-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 4px;
+}
+
+.finding-section > .finding-row,
+.treatment-section > .finding-row {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  gap: 3px;
+  align-content: center;
+}
+
+.finding-section > .finding-row:nth-child(odd):not(:last-child)::after,
+.treatment-section > .finding-row:nth-child(odd):not(:last-child)::after {
+  content: "|";
+  position: absolute;
+  right: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted, #62748b);
+  font-weight: bold;
+}
+
+
+@media (max-width: 800px) {
+  .finding-section,
+  .treatment-section {
+    grid-template-columns: 1fr;
+  }
+
+  .finding-section > .finding-row::after,
+  .treatment-section > .finding-row::after {
+    content: none;
+  }
+}
+.finding-section,
+.treatment-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.category-pair {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.category-pair > .finding-row {
+  display: inline-flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 3px;
+  margin: 0;
+  padding: 4px 0;
+}
+
+.category-pair .finding-label {
+  width: auto;
+  min-width: 0;
+  margin-right: 2px;
+}
+
+.category-pair > .finding-row:not(:last-child)::after {
+  content: "|";
+  position: static;
+  transform: none;
+  margin: 0 3px;
+  color: var(--muted, #62748b);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+.odontogram-grid {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+.finding-section,
+.treatment-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+}
+
+
+.category-pair {
+  display: contents;
+}
+
+.category-pair > .finding-row {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+.category-pair > .finding-row:nth-child(n)::after {
+  content: "|";
+  position: static;
+  transform: none;
+  margin: 0 3px;
+  color: var(--muted, #62748b);
+  font-weight: bold;
+}
+
+
+.finding-section > .category-pair:last-child > .finding-row:last-child::after,
+.treatment-section > .category-pair:last-child > .finding-row:last-child::after {
+  content: none;
+}
+.dentition-button,
+#missingMain,
+#changeAge {
+  padding: 4px 9px;
+  font-size: 11px;
+  line-height: 1.1;
+}
+
+.odontogram-grid {
+  padding-top: 60px;
+}
+
+.dentition-controls,
+.main-odontogram-controls {
+  top: 12px;
+  gap: 4px;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .odontogram-grid {
+    padding-top: 96px;
+  }
+
+  .main-odontogram-controls {
+    top: 48px;
+  }
+}
+.odontogram-grid {
+  padding-top: 18px;
+}
+
+.dentition-canvas {
+  position: relative;
+  padding-top: 44px;
+}
+
+.dentition-controls,
+.main-odontogram-controls {
+  top: 0;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .dentition-canvas {
+    padding-top: 76px;
+  }
+
+  .main-odontogram-controls {
+    top: 32px;
+  }
+}
+.dentition-canvas::after {
+  left: var(--tooth-midline, 50%);
+}
+.treatment-divider {
+  height: 1px;
+  border: 0;
+  margin: 12px 0;
+  background: rgba(118, 145, 175, 0.25);
+}
+
+.odontogram-treatments h2 {
+  margin: 0 0 8px;
+}
+
+.odontogram-treatments .treatment-section {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.odontogram-grid .main-odontogram-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: auto;
+  transform: none;
+  width: auto;
+  margin: 0;
+  gap: 4px;
+  z-index: 10;
+}
+
+
+@media (max-width: 640px) {
+  .odontogram-grid .main-odontogram-controls {
+    top: 32px;
+  }
+}
+.tooth-diagram.missing {
+  visibility: visible;
+  outline: none;
+}
+
+.tooth-diagram.missing .surface,
+.tooth-diagram.missing > text,
+.tooth-diagram.missing .cervical-label,
+.tooth-diagram.missing .crown-outline,
+.tooth-diagram.missing .endo-coronal-network,
+.tooth-diagram.missing .endo-symbol,
+.tooth-diagram.missing .pulpotomy-symbol,
+.tooth-diagram.missing .post-core-symbol,
+.tooth-diagram.missing .lengthening-arrows,
+.tooth-diagram.missing .extraction-cross {
+  display: none;
+}
+
+.tooth-diagram.missing.has-implant-symbol .implant-symbol,
+.tooth[hidden] .tooth-diagram.has-implant-symbol .implant-symbol {
+  display: block;
+  visibility: visible;
+}
+/* Vitals above Diagnosis */
+.vitals-panel { margin: 10px 0 12px; }
+.vitals-panel h2 { margin: 0 0 8px; }
+.vitals-fields { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 24px; }
+.vital-field { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.vitals-input { width: 78px; box-sizing: border-box; padding: 5px 7px;
+  border: 1px solid rgba(118,145,175,.4); border-radius: 8px;
+  background: rgba(255,255,255,.75); color: inherit; font: inherit; }
+#vitalBP { width: 96px; }
+.vitals-input:focus { outline: 2px solid rgba(84,141,224,.5); outline-offset: 1px; }
+
+/* Treatment remains in its own area below the odontogram. */
+.clinical-panels.treatment-panels { margin-top: 18px; }
+.treatment-panels > .clinical-panel {
+  padding: 14px; border: 1px solid var(--glass-border); border-radius: 18px;
+  background: var(--glass); box-shadow: var(--panel-shadow);
+}
+.treatment-panels h2 { margin: 0 0 8px; }
+.treatment-panels .treatment-section {
+  padding: 0; border: 0; background: transparent; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.treatment-panels .finding-row::after { content: none; }
+
+/* Four COHRI lines */
+.cohri-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 9px 0; font-size: 13px; }
+.cohri-label { flex: 0 0 250px; font-weight: 600; }
+.cohri-option { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; cursor: pointer; }
+.cohri-choice { margin: 0; accent-color: #2563eb; }
+.cohri-details { width: 280px; max-width: 100%; box-sizing: border-box; padding: 5px 7px;
+  border: 1px solid rgba(118,145,175,.4); border-radius: 8px;
+  background: rgba(255,255,255,.75); color: inherit; font: inherit; }
+.cohri-details[hidden] { display: none; }
+.cohri-details:focus { outline: 2px solid rgba(84,141,224,.5); outline-offset: 1px; }
+@media (max-width: 640px) { .cohri-label { flex-basis: 100%; } }
+
+/* Both treatment sections are inside the odontogram below Diagnosis. */
+.planned-treatment, .treatment-provided { margin-top: 12px; }
+.planned-treatment h2, .treatment-provided h2 { margin: 12px 0 8px; }
+.planned-treatment .treatment-section {
+  display: flex; flex-direction: column; gap: 6px; padding: 0;
+  border: 0; background: transparent; box-shadow: none;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.planned-treatment .finding-row::after { content: none; }
+
+/* Treatment provided is a separate glass panel. */
+.treatment-provided {
+  margin: 18px 0 0; max-width: 1450px; box-sizing: border-box; padding: 16px 20px;
+  border: 1px solid var(--glass-border); border-radius: 20px;
+  background: var(--glass); box-shadow: var(--panel-shadow);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+}
+.treatment-provided h2 { margin: 0 0 12px; }
+.treatment-provided .cohri-label { flex-basis: 150px; }
+.treatment-provided .cohri-option { white-space: normal; }
+.provided-input[type="radio"], .provided-input[type="checkbox"] { margin: 0; accent-color: #2563eb; }
+.provided-input:not([type="radio"]):not([type="checkbox"]) {
+  max-width: 100%; box-sizing: border-box; padding: 5px 7px;
+  border: 1px solid rgba(118,145,175,.4); border-radius: 8px;
+  background: rgba(255,255,255,.75); color: inherit; font: inherit;
+}
+.provided-number { width: 85px; }
+.provided-conditional[hidden] { display: none; }
+.anesthesia-details { margin: 8px 0 12px 164px; padding: 12px; border: 1px solid rgba(118,145,175,.2); border-radius: 12px; }
+.anesthesia-details h3 { font-size: 13px; margin: 0 0 10px; }
+.anesthesia-fields { display: flex; flex-wrap: wrap; gap: 10px 20px; font-size: 13px; }
+.anesthesia-fields label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.anesthesia-locations { margin-top: 12px; font-size: 13px; }
+.field-caption { display: block; margin-bottom: 8px; font-weight: 600; }
+.nerve-side { margin: 8px 0; }
+.block-options { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0 8px 22px; }
+@media (max-width: 640px) {
+  .treatment-provided .cohri-label { flex-basis: 100%; }
+  .anesthesia-details { margin-left: 0; }
+}
+
+.provided-section { margin-top: 16px; }
+.provided-section h3 { margin: 0 0 8px; font-size: 14px; }
+
+#generatedNote { width: 100%; min-height: 430px; box-sizing: border-box; padding: 14px; resize: vertical; border: 1px solid rgba(118,145,175,.4); border-radius: 12px; background: rgba(255,255,255,.75); color: inherit; font: 14px/1.65 "Times New Roman", Times, serif; }
+.note-panel .cohri-row > label { display: inline-flex; align-items: center; gap: 6px; }
+
+#generatedNote { overflow-wrap: anywhere; user-select: text; }
+#generatedNote strong { font-weight: 700; }
+
+.btn-chipped { background: #ffcc80; color: #222; }
+.surface.chipped { fill: #ffcc80; }
+
+#generatedNote:focus { outline: 2px solid rgba(84,141,224,.5); outline-offset: 2px; }
+
+.planned-treatment .treatment-section { align-items: flex-start; }
+.planned-treatment .finding-row { justify-content: flex-start; width: auto; padding-left: 0; margin-left: 0; }
+.planned-treatment .finding-label { width: auto; min-width: 0; flex: 0 0 auto; text-align: left; }
+.diagnosis-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+.diagnosis-tag { display: inline-flex; align-items: center; border: 1px solid rgba(118,145,175,.4); border-radius: 14px; background: rgba(255,255,255,.75); overflow: hidden; }
+.diagnosis-tag button { margin: 0; border: 0; border-radius: 0; background: transparent; color: inherit; box-shadow: none; padding: 5px 8px; font-size: 12px; cursor: pointer; }
+.diagnosis-tag-select[aria-pressed="true"] { background: rgba(84,141,224,.22); font-weight: bold; }
+.diagnosis-tag .diagnosis-tag-remove { padding-left: 5px; color: #b42318; font-weight: bold; }
+.diagnosis-tag button:focus-visible { outline: 2px solid #548de0; outline-offset: -2px; }
+
+#generatedNote, #generatedNote * { font-family: "Times New Roman", Times, serif; }
+
+.n-shortcut-row:focus, .n-shortcut-row:focus-within { outline: 1px solid rgba(84,141,224,.45); outline-offset: 4px; border-radius: 6px; }
+
+.provided-tags { margin: 0; flex: 1 1 240px; }
+.provided-tags[hidden] { display: none; }
