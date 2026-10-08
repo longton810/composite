@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diagnosis and Filling Odontogram</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="odontogram-grid">
+    <div class="dentition-canvas">
+      <div class="dentition-controls" aria-label="Dentition">
+        <button type="button" class="dentition-button active" data-dentition="permanent" aria-pressed="true">Full permanent</button>
+        <button type="button" class="dentition-button" data-dentition="primary" aria-pressed="false">Full primary</button>
+        <button type="button" class="dentition-button" data-dentition="mixed" aria-pressed="false">Mixed</button>
+      </div>
+      <div class="arch" id="maxillary"></div>
+      <div class="quadrant-horizontal-line"></div>
+      <div class="arch" id="mandibular"></div>
+      <div class="main-odontogram-controls">
+        <button id="missingMain" class="finding whole-finding btn-missing" data-name="missing" aria-keyshortcuts="m">(M) Missing</button>
+        <button id="changeAge" class="main-control-button">Change Age</button>
+      </div>
+    </div>
+    <section class="clinical-panel vitals-panel cohri-panel" aria-labelledby="cohriHeading">
+      <h2 id="cohriHeading">COHRI</h2>
+      <div class="cohri-row">
+        <span class="cohri-label">Vitals</span>
+        <div class="vitals-fields">
+        <label class="vital-field" for="vitalBP">BP
+          <input id="vitalBP" class="vitals-input" data-vital="bp" type="text" inputmode="text" aria-describedby="bpUnit">
+          <span id="bpUnit">mmHg</span>
+        </label>
+        <label class="vital-field" for="vitalPulse">Pulse
+          <input id="vitalPulse" class="vitals-input" data-vital="pulse" type="text" inputmode="numeric" aria-describedby="pulseUnit">
+          <span id="pulseUnit">bpm</span>
+        </label>
+        <label class="vital-field" for="vitalTemperature">Temperature
+          <input id="vitalTemperature" class="vitals-input" data-vital="temperature" type="text" inputmode="decimal" aria-describedby="temperatureUnit">
+          <span id="temperatureUnit">°F</span>
+        </label>
+        </div>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="historyLabel">
+        <span class="cohri-label" id="historyLabel">Update medical and dental history</span>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-history" value="no-change" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No change</label>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-history" value="change" aria-controls="historyDetails" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Change</label>
+        <input id="historyDetails" class="cohri-details" type="text" aria-label="Update medical and dental history details" hidden>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="medicationLabel">
+        <span class="cohri-label" id="medicationLabel">Update medication</span>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-medication" value="no-change" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No change</label>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-medication" value="change" aria-controls="medicationDetails" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Change</label>
+        <input id="medicationDetails" class="cohri-details" type="text" aria-label="Update medication details" hidden>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="premedicationLabel">
+        <span class="cohri-label" id="premedicationLabel">Premedication</span>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-premedication" value="none" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> None</label>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-premedication" value="yes" aria-controls="premedicationDetails" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+        <input id="premedicationDetails" class="cohri-details" type="text" aria-label="Premedication details" hidden>
+      </div>
+    </section>
+    <section class="clinical-panel odontogram-findings">
+      <h2>Diagnosis</h2>
+      <div class="finding-section">
+        <div class="finding-row">
+          <span class="finding-label">Caries:</span>
+          <button class="finding surface-finding btn-caries" data-name="decay" aria-keyshortcuts="d">(D) Decay</button>
+          <button class="finding surface-finding btn-decalcified" data-name="decalcified">Decalcified</button>
+          <button class="finding surface-finding btn-stain" data-name="stain">Stain</button>
+          <button class="finding surface-finding btn-incipient" data-name="incipient caries" aria-keyshortcuts="i">(I) Incipient</button>
+          <button class="finding surface-finding btn-recurrent" data-name="recurrent caries">Recurrent</button>
+          <button class="finding surface-finding btn-gross" data-name="gross caries">Gross</button>
+        </div>
+        <div class="finding-row">
+          <span class="finding-label">Existing:</span>
+          <button class="finding surface-finding btn-composite" data-name="composite" aria-keyshortcuts="c">(C) Composite</button>
+          <button class="finding surface-finding btn-amalgam" data-name="amalgam" aria-keyshortcuts="a">(A) Amalgam</button>
+          <button class="finding surface-finding btn-sealant" data-name="sealant">Sealant</button>
+          <button class="finding surface-finding btn-irm" data-name="IRM">IRM</button>
+        </div>
+        <div class="finding-row">
+          <span class="finding-label">Non-carious:</span>
+          <button type="button" class="finding surface-finding btn-wear" data-name="wear">Wear</button>
+          <button type="button" class="finding surface-finding btn-chipped" data-name="chipped">Chipped</button>
+          <button type="button" class="finding surface-finding btn-abfraction" data-name="abfraction">Abfraction</button>
+          <button type="button" class="finding surface-finding btn-erosion" data-name="erosion">Erosion</button>
+          <button type="button" class="finding surface-finding btn-crack" data-name="crack line">Crack Line</button>
+          <button type="button" class="finding surface-finding btn-broken" data-name="broken">Broken</button>
+        </div>
+      </div>
+      <div id="diagnosisTags" class="diagnosis-tags" role="group" aria-label="Select or delete diagnoses"></div>
+    </section>
+    <section class="clinical-panel planned-treatment">
+      <h2>Planned Treatment</h2>
+      <div class="treatment-section">
+        <div class="finding-row">
+          <span class="finding-label">Filling:</span>
+          <button type="button" class="treatment surface-treatment btn-composite" data-treatment="Composite">Composite</button>
+          <button type="button" class="treatment surface-treatment btn-amalgam" data-treatment="Amalgam">Amalgam</button>
+          <button type="button" class="treatment surface-treatment btn-rmgi" data-treatment="RMGI">RMGI</button>
+          <button type="button" class="treatment surface-treatment btn-irm" data-treatment="IRM">IRM</button>
+        </div>
+      </div>
+      <div id="plannedTreatmentTags" class="diagnosis-tags" role="group" aria-label="Select or delete planned treatments"></div>
+    </section>
+  </div>
+  <section class="clinical-panel treatment-provided" aria-labelledby="providedHeading">
+    <h2 id="providedHeading">Treatment provided</h2>
+    <div class="cohri-row provided-main-row" role="group" aria-labelledby="providedPlanLabel">
+        <span id="providedPlanLabel" class="cohri-label">Treatment</span>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-provided" value="same-as-planned" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> Same as planned</label>
+        <label class="cohri-option"><input class="cohri-choice" type="radio" name="cohri-provided" value="change" aria-controls="providedTreatmentTags"> Change</label>
+        <div id="providedTreatmentTags" class="diagnosis-tags provided-tags" role="group" aria-label="Select or delete provided treatments" hidden></div>
+        <input id="providedDetails" class="cohri-details" type="text" aria-label="Treatment provided changes" hidden>
+      </div>
+    <div class="cohri-row provided-main-row" role="group" aria-labelledby="inhaledNOLabel">
+      <span id="inhaledNOLabel" class="cohri-label">Inhaled NO</span>
+      <label class="cohri-option"><input id="inhaledNONone" class="provided-input" type="radio" name="inhaledNO" value="none" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> None</label>
+      <label class="cohri-option"><input id="inhaledNOYes" class="provided-input" type="radio" name="inhaledNO" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+    </div>
+    <div class="cohri-row provided-main-row" role="group" aria-labelledby="localAnesthesiaLabel">
+      <span id="localAnesthesiaLabel" class="cohri-label">Local anesthesia</span>
+      <label class="cohri-option"><input id="topicalBenzocaine" class="provided-input" type="checkbox"> Topical benzocaine</label>
+      <label class="cohri-option"><input id="nerveBlock" class="provided-input" type="checkbox" aria-controls="nerveBlockDetails"> Nerve block</label>
+      <label class="cohri-option"><input id="localInfiltration" class="provided-input" type="checkbox" aria-controls="infiltrationDetails"> Local infiltration</label>
+    </div>
+    <div id="nerveBlockDetails" class="provided-conditional anesthesia-details" hidden>
+      <h3>Nerve block</h3>
+        <div class="anesthesia-fields">
+          <label for="nerveCarpules"># of carpules <input id="nerveCarpules" class="provided-input provided-number" type="number" min="0" step="any"></label>
+          <label for="nerveLA">Name of LA <select id="nerveLA" class="provided-input">
+            <option value="lidocaine" selected>2% Lidocaine with 1:100K epi</option>
+            <option value="articaine">4% of Articaine with 1:100K epi</option>
+            <option value="mepivacaine">3% of Mepivacaine (plain)</option>
+            <option value="bupivacaine">0.5% of Bupivacaine with 1:200K epi</option>
+          </select></label>
+        </div>
+      <div class="anesthesia-locations">
+        <span class="field-caption">Locations</span>
+        <div class="nerve-side">
+          <label class="cohri-option"><input id="nerveRight" class="provided-input" type="checkbox" aria-controls="nerveRightBlocks"> Right</label>
+          <div id="nerveRightBlocks" class="provided-conditional block-options" hidden>
+            <label class="cohri-option"><input id="nerveRight0" class="provided-input" type="checkbox"> PSA</label>
+            <label class="cohri-option"><input id="nerveRight1" class="provided-input" type="checkbox"> MSA</label>
+            <label class="cohri-option"><input id="nerveRight2" class="provided-input" type="checkbox"> ASA</label>
+            <label class="cohri-option"><input id="nerveRight3" class="provided-input" type="checkbox"> Palatal</label>
+            <label class="cohri-option"><input id="nerveRight4" class="provided-input" type="checkbox"> IAN</label>
+            <label class="cohri-option"><input id="nerveRight5" class="provided-input" type="checkbox"> Buccal block</label>
+            <label class="cohri-option"><input id="nerveRight6" class="provided-input" type="checkbox"> Mental block</label>
+          </div>
+        </div>
+        <div class="nerve-side">
+          <label class="cohri-option"><input id="nerveLeft" class="provided-input" type="checkbox" aria-controls="nerveLeftBlocks"> Left</label>
+          <div id="nerveLeftBlocks" class="provided-conditional block-options" hidden>
+            <label class="cohri-option"><input id="nerveLeft0" class="provided-input" type="checkbox"> PSA</label>
+            <label class="cohri-option"><input id="nerveLeft1" class="provided-input" type="checkbox"> MSA</label>
+            <label class="cohri-option"><input id="nerveLeft2" class="provided-input" type="checkbox"> ASA</label>
+            <label class="cohri-option"><input id="nerveLeft3" class="provided-input" type="checkbox"> Palatal</label>
+            <label class="cohri-option"><input id="nerveLeft4" class="provided-input" type="checkbox"> IAN</label>
+            <label class="cohri-option"><input id="nerveLeft5" class="provided-input" type="checkbox"> Buccal block</label>
+            <label class="cohri-option"><input id="nerveLeft6" class="provided-input" type="checkbox"> Mental block</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="infiltrationDetails" class="provided-conditional anesthesia-details" hidden>
+      <h3>Local infiltration</h3>
+        <div class="anesthesia-fields">
+          <label for="infiltrationCarpules"># of carpules <input id="infiltrationCarpules" class="provided-input provided-number" type="number" min="0" step="any"></label>
+          <label for="infiltrationLA">Name of LA <select id="infiltrationLA" class="provided-input">
+            <option value="lidocaine">2% Lidocaine with 1:100K epi</option>
+            <option value="articaine" selected>4% of Articaine with 1:100K epi</option>
+            <option value="mepivacaine">3% of Mepivacaine (plain)</option>
+            <option value="bupivacaine">0.5% of Bupivacaine with 1:200K epi</option>
+          </select></label>
+        </div>
+    </div>
+    <div class="cohri-row provided-main-row" role="group" aria-labelledby="isolationLabel">
+      <span id="isolationLabel" class="cohri-label">Isolation</span>
+      <label class="cohri-option"><input id="isolationDam" class="provided-input" type="radio" name="isolation" value="rubber-dam"> Clamps and rubber dam</label>
+      <label class="cohri-option"><input id="isolationIsolite" class="provided-input" type="radio" name="isolation" value="isolite"> Isolite with high volume suction</label>
+      <label class="cohri-option"><input id="isolationCotton" class="provided-input" type="radio" name="isolation" value="cotton-rolls"> Dri-angle, throat pack and cotton rolls</label>
+    </div>
+    <div class="cohri-row provided-main-row">
+      <label class="cohri-label" for="providedShade">Shade</label>
+      <select id="providedShade" class="provided-input"><option>A1</option><option selected>A2</option><option>A3</option><option>A3.5</option><option>B1</option><option>B2</option><option>C1</option></select>
+    </div>
+    <section class="provided-section" aria-labelledby="preparationHeading">
+      <h3 id="preparationHeading">Preparation</h3>
+      <div class="cohri-row" role="group" aria-label="Removal">
+        <label class="cohri-option"><input id="removeCaries" class="provided-input" type="checkbox"> Remove caries</label>
+        <label class="cohri-option"><input id="removeOldFilling" class="provided-input" type="checkbox"> Remove old filling</label>
+      </div>
+      <div class="cohri-row" role="group" aria-label="Preparation technique">
+        <label class="cohri-option"><input id="conventionalPrep" class="provided-input" type="radio" name="preparation-technique" value="conventional"> Conventional prep</label>
+        <label class="cohri-option"><input id="conservativePrep" class="provided-input" type="radio" name="preparation-technique" value="conservative"> Conservative prep</label>
+      </div>
+      <div id="proximalPrep" class="cohri-row provided-conditional" role="group" aria-label="M or D preparation" hidden>
+        <label class="cohri-option"><input id="mdBox" class="provided-input" type="radio" name="proximal-preparation" value="box"> M/D box</label>
+        <label class="cohri-option"><input id="slotPrep" class="provided-input" type="radio" name="proximal-preparation" value="slot"> Slot prep</label>
+      </div>
+    </section>
+    <section class="provided-section" aria-labelledby="restorationHeading">
+      <h3 id="restorationHeading">Restoration</h3>
+      <div class="cohri-row" role="group" aria-labelledby="glumaLabel">
+        <span id="glumaLabel" class="cohri-label">GLUMA desensitizer</span>
+        <label class="cohri-option"><input id="glumaNo" class="provided-input" type="radio" name="restoration-gluma" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="glumaYes" class="provided-input" type="radio" name="restoration-gluma" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="imgiLabel">
+        <span id="imgiLabel" class="cohri-label">IMGI liner</span>
+        <label class="cohri-option"><input id="imgiNo" class="provided-input" type="radio" name="restoration-imgi" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="imgiYes" class="provided-input" type="radio" name="restoration-imgi" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="flowableLabel">
+        <span id="flowableLabel" class="cohri-label">Flowable composite</span>
+        <label class="cohri-option"><input id="flowableNo" class="provided-input" type="radio" name="restoration-flowable" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="flowableYes" class="provided-input" type="radio" name="restoration-flowable" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="compactableLabel">
+        <span id="compactableLabel" class="cohri-label">Packable composite</span>
+        <label class="cohri-option"><input id="compactableNo" class="provided-input" type="radio" name="restoration-compactable" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="compactableYes" class="provided-input" type="radio" name="restoration-compactable" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+    </section>
+  </section>
+  <section class="clinical-panel treatment-provided note-panel" aria-labelledby="noteHeading">
+    <h2 id="noteHeading">Note</h2>
+    <div class="cohri-row">
+      <label for="noteNV">NV: <input id="noteNV" class="provided-input" type="text" aria-label="Next visit"></label>
+      <label for="notePreceptor">Preceptor: <input id="notePreceptor" class="provided-input" type="text"></label>
+      <button id="copyNote" type="button">Copy Note</button>
+      <span id="noteCopyStatus" role="status"></span>
+    </div>
+    <div id="generatedNote" role="textbox" aria-label="Editable clinical note" aria-multiline="true" contenteditable="true" spellcheck="true" tabindex="0"></div>
+  </section>
+  <div id="autosaveMessage" role="status"></div>
+  <div class="clear-all-area">
+    <button id="clearAll" type="button">Clear All</button>
+  </div>
+  <dialog id="clearAllDialog" aria-labelledby="clearAllTitle" aria-describedby="clearAllDescription">
+    <h3 id="clearAllTitle">Clear all data?</h3>
+    <p id="clearAllDescription">Delete all diagnoses, planned and provided treatments, and COHRI information, and reset tooth settings? This cannot be undone.</p>
+    <div class="clear-all-actions">
+      <button id="cancelClearAll" type="button" autofocus>No, keep data</button>
+      <button id="confirmClearAll" type="button">Yes, delete all</button>
+    </div>
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>
