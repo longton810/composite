@@ -682,6 +682,11 @@ byId("providedDetails").addEventListener("input", updatePreparationFields);
 all('input[name="cohri-provided"]').forEach(input => input.addEventListener("change", updatePreparationFields));
 
 function updateTreatmentProvidedFields() {
+  byId("notePreceptorOther").hidden = byId("notePreceptor").value !== "Others";
+  ['Codes', 'Swipe'].forEach(role => {
+    byId('note'+role+'Fields').hidden = !byId('note'+role+'Different').checked;
+    byId('note'+role+'Other').hidden = byId('note'+role+'Preceptor').value !== 'Others';
+  });
   updatePreparationFields();
   byId("nerveBlockDetails").hidden = !byId("nerveBlock").checked;
   byId("infiltrationDetails").hidden = !byId("localInfiltration").checked;
@@ -707,6 +712,13 @@ function restoreTreatmentProvided(data = {}) {
         ? saved : fallback;
     } else input.value = typeof saved === "string" ? saved : input.defaultValue;
   });
+  // Preserve names saved when the main preceptor field was free text.
+  if (typeof data.notePreceptor === 'string' && data.notePreceptor &&
+      ![...byId('notePreceptor').options].some(option => option.value === data.notePreceptor)) {
+    byId('notePreceptor').value = 'Others';
+    byId('notePreceptorOther').value = data.notePreceptor;
+  }
+
   updateTreatmentProvidedFields();
 }
 
@@ -840,7 +852,12 @@ function generateClinicalNote(s) {
     lines.push(`- ${bold(`Restoration ${sites.join(", ")}:`)} ${restoration.join(" ")}`);
     lines.push("", "Postoperative instructions were provided, including avoiding chewing until anesthesia wears off, maintaining oral hygiene, and expecting temporary sensitivity. The patient was advised to contact the clinic for a high bite, persistent sensitivity, or worsening pain.");
   }
-  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} Long Ton`, `${bold("Preceptor:")} ${escape(p.notePreceptor)}`, `${bold("Clinic:")} POD2 - 242`);
+  const rolePreceptor = role => p['note'+role+'Preceptor'] === 'Others'
+    ? p['note'+role+'Other'] || '' : p['note'+role+'Preceptor'] || '';
+  const additionalPreceptors = ['Codes', 'Swipe'].filter(role => p['note'+role+'Different'] && rolePreceptor(role))
+    .map(role => rolePreceptor(role) + (role === 'Codes' ? ' - for completed codes' : ' - for swiping note'));
+  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} Long Ton`, `${bold("Preceptor:")} ${escape(p.notePreceptor === "Others" ? p.notePreceptorOther : p.notePreceptor)}`,
+    ...(additionalPreceptors.length ? [bold('('+additionalPreceptors.join(', ')+')')] : []), `${bold("Clinic:")} POD2 - 242`);
   return lines.join("<br>");
 }
 
@@ -964,6 +981,9 @@ byId("generatedNote").addEventListener("input", () => {
 });
 byId("copyNote").addEventListener("click", async () => {
   const note = byId("generatedNote");
+  note.classList.remove('note-copy-blink');
+  void note.offsetWidth;
+  note.classList.add('note-copy-blink');
   try {
     const plain = note.innerText;
     const html = `<div style="font-family:'Times New Roman',Times,serif;font-size:14px;line-height:1.65;color:#000">${note.innerHTML.replaceAll("<strong>", '<strong style="font-weight:700">')}</div>`;
@@ -1067,4 +1087,17 @@ document.addEventListener("keydown", event => {
   event.preventDefault();
   saveOdontogram(true);
   advanceFormLine(input);
+});
+
+['Codes', 'Swipe'].forEach(role => {
+  byId('note'+role+'Preceptor').addEventListener('change', () => {
+    if (byId('note'+role+'Preceptor').value === 'Others') byId('note'+role+'Other').focus();
+  });
+});
+byId('generatedNote').addEventListener('animationend', event => {
+  if (event.animationName === 'note-copy-blink') byId('generatedNote').classList.remove('note-copy-blink');
+});
+
+byId('notePreceptor').addEventListener('change', () => {
+  if (byId('notePreceptor').value === 'Others') byId('notePreceptorOther').focus();
 });
