@@ -354,3 +354,44 @@ button:focus-visible,.tooth-number:focus-visible { outline:2px solid #2563eb; ou
 .n-shortcut-row:focus, .n-shortcut-row:focus-within { outline: 1px solid rgba(84,141,224,.45); outline-offset: 4px; border-radius: 6px; }
 .provided-tags { margin: 0; flex: 1 1 240px; }
 .provided-tags[hidden] { display: none; }
+
+/* Note copying and additional preceptors. */
+.different-preceptors { display: flex; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; gap: 10px 16px; margin-left: auto; font-size: 13px; }
+.different-preceptor-option { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.different-preceptor-fields { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.different-preceptor-fields[hidden], #noteCodesOther[hidden], #noteSwipeOther[hidden] { display: none; }
+.copy-note-controls { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.note-fields-row { align-items: flex-start; }
+.note-fields-row .different-preceptors { align-items: flex-start; }
+.note-fields-row .different-preceptors > span { line-height: 30px; }
+.note-fields-row .different-preceptor-option > .cohri-option { min-height: 30px; }
+@media (max-width: 640px) {
+  .note-fields-row .different-preceptors { margin-left: 0; justify-content: flex-start; }
+}
+.note-panel > .copy-note-controls { margin-top: 18px; display: flex; align-items: center; }
+#copyNote { padding: 12px 34px; font-size: 15px; font-weight: 600; }
+#copyNote:active { box-shadow: 0 2px 5px rgba(37,99,235,.2); }
+#copyNote { border-radius: 12px; color: white; background: linear-gradient(145deg,rgba(72,137,250,.92),rgba(29,78,216,.78)); border: 1px solid rgba(168,204,255,.7); box-shadow: inset 0 1px 0 rgba(255,255,255,.45),0 5px 14px rgba(37,99,235,.22); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+#copyNote:hover { background: linear-gradient(145deg,rgba(90,151,255,.96),rgba(37,99,235,.85)); }
+#copyNote:active { background: linear-gradient(145deg,rgba(37,99,235,.92),rgba(30,64,175,.85)); }
+#copyNote { position: relative; overflow: hidden; transition: transform .2s ease, box-shadow .2s ease, filter .2s ease; }
+#copyNote::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg,transparent 25%,rgba(255,255,255,.35) 50%,transparent 75%); transform: translateX(-150%); transition: transform .55s ease; pointer-events: none; }
+#copyNote:hover { transform: translateY(-3px); filter: brightness(1.08); box-shadow: inset 0 1px 0 rgba(255,255,255,.6),0 9px 22px rgba(37,99,235,.35); }
+#copyNote:hover::before { transform: translateX(150%); }
+#copyNote:active { transform: translateY(0); filter: brightness(1); }
+#copyNote:focus-visible { outline: 3px solid #93c5fd; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  #copyNote, #copyNote::before { transition: none; }
+  #copyNote:hover { transform: none; }
+  #copyNote::before { display: none; }
+}
+@keyframes note-copy-blink { 0%,100% { background-color: transparent; box-shadow: none; } 35% { background-color: rgba(254,240,138,.45); box-shadow: 0 0 0 4px rgba(253,224,71,.18); } }
+#generatedNote.note-copy-blink { animation: note-copy-blink .6s ease-out; border-radius: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  #generatedNote.note-copy-blink { animation: note-copy-blink .2s linear; }
+}
+#noteCodesOther[hidden], #noteSwipeOther[hidden] { display: none; }
+.note-panel .different-preceptor-fields select { padding: 5px 7px; border: 1px solid #c4d1df; border-radius: 6px; font-size: 13px; max-width: 100%; }
+
+#notePreceptorOther[hidden] { display: none; }
+#notePreceptor { padding: 5px 7px; border: 1px solid #c4d1df; border-radius: 6px; font-size: 13px; max-width: 100%; }
