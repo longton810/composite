@@ -682,6 +682,7 @@ byId("providedDetails").addEventListener("input", updatePreparationFields);
 all('input[name="cohri-provided"]').forEach(input => input.addEventListener("change", updatePreparationFields));
 
 function updateTreatmentProvidedFields() {
+  byId('noteAssistant').hidden = !byId('noteAssistantEnabled').checked;
   byId("notePreceptorOther").hidden = byId("notePreceptor").value !== "Others";
   ['Codes', 'Swipe'].forEach(role => {
     byId('note'+role+'Fields').hidden = !byId('note'+role+'Different').checked;
@@ -702,6 +703,7 @@ function readTreatmentProvided() {
 }
 
 function restoreTreatmentProvided(data = {}) {
+  data = { ...data, noteAssistantEnabled: typeof data.noteAssistantEnabled === 'boolean' ? data.noteAssistantEnabled : Boolean(data.noteAssistant?.trim()) };
   all(".provided-input").forEach(input => {
     const saved = data?.[input.id];
     if (["checkbox", "radio"].includes(input.type)) {
@@ -856,7 +858,7 @@ function generateClinicalNote(s) {
     ? p['note'+role+'Other'] || '' : p['note'+role+'Preceptor'] || '';
   const additionalPreceptors = ['Codes', 'Swipe'].filter(role => p['note'+role+'Different'] && rolePreceptor(role))
     .map(role => rolePreceptor(role) + (role === 'Codes' ? ' - for completed codes' : ' - for swiping note'));
-  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} Long Ton`, `${bold("Preceptor:")} ${escape(p.notePreceptor === "Others" ? p.notePreceptorOther : p.notePreceptor)}`,
+  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} Long Ton`, ...(p.noteAssistantEnabled ? [`${bold("Assistant:")} ${escape(p.noteAssistant)}`] : []), `${bold("Preceptor:")} ${escape(p.notePreceptor === "Others" ? p.notePreceptorOther : p.notePreceptor)}`,
     ...(additionalPreceptors.length ? [bold('('+additionalPreceptors.join(', ')+')')] : []), `${bold("Clinic:")} POD2 - 242`);
   return lines.join("<br>");
 }
