@@ -858,7 +858,7 @@ function generateClinicalNote(s) {
     ? p['note'+role+'Other'] || '' : p['note'+role+'Preceptor'] || '';
   const additionalPreceptors = ['Codes', 'Swipe'].filter(role => p['note'+role+'Different'] && rolePreceptor(role))
     .map(role => rolePreceptor(role) + (role === 'Codes' ? ' - for completed codes' : ' - for swiping note'));
-  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} Long Ton`, ...(p.noteAssistantEnabled ? [`${bold("Assistant:")} ${escape(p.noteAssistant)}`] : []), `${bold("Preceptor:")} ${escape(p.notePreceptor === "Others" ? p.notePreceptorOther : p.notePreceptor)}`,
+  lines.push("", `${bold("NV:")} ${escape(p.noteNV)}`, `${bold("Student Dr:")} ${escape(p.noteStudent || "")}`, ...(p.noteAssistantEnabled ? [`${bold("Assistant:")} ${escape(p.noteAssistant)}`] : []), `${bold("Preceptor:")} ${escape(p.notePreceptor === "Others" ? p.notePreceptorOther : p.notePreceptor)}`,
     ...(additionalPreceptors.length ? [bold('('+additionalPreceptors.join(', ')+')')] : []), `${bold("Clinic:")} POD2 - 242`);
   return lines.join("<br>");
 }
