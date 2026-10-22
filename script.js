@@ -425,7 +425,7 @@ function renderFindings() {
   };
   const crownFindings = [ "SSC", "Zirconia crown", "PFM crown", "Metal crown", "implant" ];
   const crownTreatments = [ "CBU", "SSC", "Zirconia", "PFM", "Metal", "Bridge", "bridge", "Implant", "implant" ];
-  const fillingTreatments = [ "Composite", "Amalgam", "RMGI", "IRM" ];
+  const fillingTreatments = [ "Composite", "Amalgam", "RMGI", "IRM", "Sealant" ];
   all(".cervical-label").forEach( label => { label.textContent = "C"; });
   all(".root-markers").forEach( marker => { marker.innerHTML = ""; });
   all(".surface").forEach( surface => {
@@ -853,7 +853,8 @@ function generateClinicalNote(s) {
   if (p.localInfiltration) anesthesia.push(`${p.nerveBlock ? "Then local infiltration" : "Local infiltration"} with ${field(carpuleDescription(p.infiltrationCarpules, drug(s.infiltrationLA)))} was administered around the tooth.`);
   if (anesthesia.length) lines.push(`${bold("- Anesthesia:")} ${anesthesia.join(" ")}`);
   const irmRestorations = restorations.filter(record => record.finding.toLowerCase() === 'irm');
-  const definitiveRestorations = restorations.filter(record => record.finding.toLowerCase() !== 'irm');
+  const sealantTreatments = restorations.filter(record => record.finding.toLowerCase() === 'sealant');
+  const definitiveRestorations = restorations.filter(record => !['irm','sealant'].includes(record.finding.toLowerCase()));
   if (definitiveRestorations.length) {
     const restorations = definitiveRestorations;
     const sites = [...new Set(restorations.map(site))];
@@ -918,6 +919,10 @@ function generateClinicalNote(s) {
   if (irmRestorations.length) {
     const irmSites = [...new Set(irmRestorations.map(site))];
     lines.push(`- ${bold(`IRM ${irmSites.join(", ")}:`)} Carious tooth structure was removed as indicated. The cavity was rinsed and gently dried. IRM was mixed according to the manufacturer's instructions, placed into the cavity, and adapted to the cavity walls and margins. Excess material was removed, and the restoration was contoured to reproduce natural tooth anatomy. After setting, occlusion was checked and adjusted as needed.`);
+  }
+  if (sealantTreatments.length) {
+    const sealantSites = [...new Set(sealantTreatments.map(site))];
+    lines.push(`- ${bold(`Sealant ${sealantSites.join(", ")}:`)} The occlusal surface was cleaned using a prophy brush and prophy paste. The tooth was isolated with cotton rolls and suction. The pits and fissures were etched with 37% phosphoric acid, rinsed, and air-dried. Resin-based sealant was applied to the pits and fissures and light-cured. Sealant retention, coverage, margins, and occlusion were checked.`);
   }
   if (restorations.length) {
     lines.push("", "Postoperative instructions were provided, including avoiding chewing until anesthesia wears off, maintaining oral hygiene, and expecting temporary sensitivity. The patient was advised to contact the clinic for a high bite, persistent sensitivity, or worsening pain.");
