@@ -523,3 +523,55 @@ body .note-fields-row.fit-note-fields .different-preceptors {
 }
 body .note-fields-row.fit-note-fields .different-preceptor-option { flex: none; }
 body .note-fields-row.fit-note-fields .cohri-option { white-space: nowrap; }
+
+/* Diagnosis categories match Odontogram. */
+.btn-pit { background:#80cbc4; color:#fff; }
+.btn-deep-groove { background:#4db6ac; color:#fff; }
+.btn-short-margin { background:#42a5f5; color:white; }
+.btn-overhang { background:#42a5f5; color:white; }
+.btn-open-margin { background:#42a5f5; color:white; }
+.btn-rest-seat { background:#fff176; color:#222; }
+.surface.pit { fill:#80cbc4; stroke:#267f77; stroke-width:2; }
+.surface.deep-groove { fill:#4db6ac; stroke:#267f77; stroke-width:2; }
+.surface.short-margin { fill:#42a5f5; stroke:#1565c0; stroke-width:2; }
+.surface.overhang { fill:#ffb74d; stroke:#ef6c00; stroke-width:2; }
+.surface.open-margin { fill:#ff8a65; stroke:#d84315; stroke-width:2; }
+.surface.rest-seat { fill:#fff176; stroke:#b59b00; stroke-width:2; }
+.noncarious-group { display:inline-flex; align-items:center; flex-wrap:nowrap; gap:3px; }
+.noncarious-divider { color:var(--muted,#62748b); font-weight:bold; margin:0 3px; }
+.existing-material-group { display:inline-flex; align-items:center; flex-wrap:nowrap; gap:3px; }
+.existing-material-divider { color:var(--muted,#62748b); font-weight:bold; margin:0 3px; }
+
+/* Indent material-specific options beneath their headings. */
+#compositeRestorationSection > .cohri-row,
+#amalgamRestorationSection > .cohri-row { margin-left: 22px; }
+@media (max-width: 640px) {
+  #compositeRestorationSection > .cohri-row,
+  #amalgamRestorationSection > .cohri-row { margin-left: 12px; }
+}
+
+/* Frame preparation and the material-specific restoration options. */
+.provided-section[aria-labelledby="preparationHeading"],
+#compositeRestorationSection,
+#amalgamRestorationSection {
+  border: 1px solid rgba(118,145,175,.4);
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Legends interrupt each section's top border. */
+fieldset.provided-section {
+  min-width: 0;
+  margin-right: 0;
+  margin-left: 0;
+}
+fieldset.provided-section > legend {
+  padding: 0 6px;
+  margin-left: 0;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.matrix-choices { display:inline-flex; flex-wrap:wrap; align-items:center; gap:12px; margin-left:10px; }
+.matrix-choices[hidden] { display:none; }

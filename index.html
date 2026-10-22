@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Composite Restoration Note</title>
-  <link rel="stylesheet" href="style.css?v=b2916d8c50">
+  <link rel="stylesheet" href="style.css?v=matrix-yes-no-20261022">
 </head>
 <body>
   <div class="odontogram-grid">
@@ -63,8 +63,7 @@
     <section class="clinical-panel odontogram-findings">
       <h2>Diagnosis</h2>
       <div class="finding-section">
-        <div class="finding-row">
-          <span class="finding-label">Caries:</span>
+<div class="finding-row"><span class="finding-label">Caries:</span>
           <button class="finding surface-finding btn-caries" data-name="decay" aria-keyshortcuts="d">(D) Decay</button>
           <button class="finding surface-finding btn-decalcified" data-name="decalcified">Decalcified</button>
           <button class="finding surface-finding btn-stain" data-name="stain">Stain</button>
@@ -72,22 +71,29 @@
           <button class="finding surface-finding btn-recurrent" data-name="recurrent caries">Recurrent</button>
           <button class="finding surface-finding btn-gross" data-name="gross caries">Gross</button>
         </div>
-        <div class="finding-row">
-          <span class="finding-label">Existing:</span>
-          <button class="finding surface-finding btn-composite" data-name="composite" aria-keyshortcuts="c">(C) Composite</button>
-          <button class="finding surface-finding btn-amalgam" data-name="amalgam" aria-keyshortcuts="a">(A) Amalgam</button>
-          <button class="finding surface-finding btn-sealant" data-name="sealant">Sealant</button>
-          <button class="finding surface-finding btn-irm" data-name="IRM">IRM</button>
-        </div>
-        <div class="finding-row">
-          <span class="finding-label">Non-carious:</span>
-          <button type="button" class="finding surface-finding btn-wear" data-name="wear">Wear</button>
-          <button type="button" class="finding surface-finding btn-chipped" data-name="chipped">Chipped</button>
-          <button type="button" class="finding surface-finding btn-abfraction" data-name="abfraction">Abfraction</button>
-          <button type="button" class="finding surface-finding btn-erosion" data-name="erosion">Erosion</button>
-          <button type="button" class="finding surface-finding btn-crack" data-name="crack line">Crack Line</button>
-          <button type="button" class="finding surface-finding btn-broken" data-name="broken">Broken</button>
-        </div>
+<div class="finding-row"><span class="finding-label">Existing material:</span>
+<span class="existing-material-group"><button class="finding surface-finding btn-composite" data-name="composite" aria-keyshortcuts="c">(C) Composite</button>
+<button class="finding surface-finding btn-amalgam" data-name="amalgam" aria-keyshortcuts="a">(A) Amalgam</button>
+<button class="finding surface-finding btn-sealant" data-name="sealant">Sealant</button>
+<button class="finding surface-finding btn-irm" data-name="IRM">IRM</button></span>
+</div>
+<div class="finding-row noncarious-row"><span class="finding-label">Non-carious:</span>
+<span class="noncarious-group"><button class="finding surface-finding btn-pit" data-name="pit">Pit</button>
+<button class="finding surface-finding btn-deep-groove" data-name="deep groove">Deep groove</button></span>
+<span class="noncarious-divider" aria-hidden="true">|</span>
+<span class="noncarious-group"><button class="finding whole-finding btn-wear" data-name="wear">Wear/Abrasion</button>
+<button class="finding surface-finding btn-abfraction" data-name="abfraction">Abfraction</button>
+<button class="finding surface-finding btn-erosion" data-name="erosion">Erosion</button></span>
+<span class="noncarious-divider" aria-hidden="true">|</span>
+<span class="noncarious-group"><button class="finding surface-finding btn-chipped" data-name="chipped">Chipped</button>
+<button class="finding surface-finding btn-crack" data-name="crack line">Crack line</button>
+<button class="finding surface-finding btn-broken" data-name="broken">Broken</button></span>
+<span class="noncarious-divider" aria-hidden="true">|</span>
+<span class="noncarious-group"><button class="finding surface-finding btn-overhang" data-name="overhang">Overhang</button>
+<button class="finding surface-finding btn-open-margin" data-name="open margin">Open margin</button>
+<button class="finding surface-finding btn-short-margin" data-name="short margin">Short margin</button>
+<button class="finding surface-finding btn-rest-seat" data-name="rest seat">Rest seat</button></span>
+</div>
       </div>
       <div id="diagnosisTags" class="diagnosis-tags" role="group" aria-label="Select or delete diagnoses"></div>
     </section>
@@ -98,7 +104,6 @@
           <span class="finding-label">Filling:</span>
           <button type="button" class="treatment surface-treatment btn-composite" data-treatment="Composite">Composite</button>
           <button type="button" class="treatment surface-treatment btn-amalgam" data-treatment="Amalgam">Amalgam</button>
-          <button type="button" class="treatment surface-treatment btn-rmgi" data-treatment="RMGI">RMGI</button>
           <button type="button" class="treatment surface-treatment btn-irm" data-treatment="IRM">IRM</button>
         </div>
       </div>
@@ -186,8 +191,7 @@
       <label class="cohri-label" for="providedShade">Shade</label>
       <select id="providedShade" class="provided-input"><option>A1</option><option selected>A2</option><option>A3</option><option>A3.5</option><option>B1</option><option>B2</option><option>C1</option></select>
     </div>
-    <section class="provided-section" aria-labelledby="preparationHeading">
-      <h3 id="preparationHeading">Preparation</h3>
+    <fieldset class="provided-section" aria-labelledby="preparationHeading"><legend id="preparationHeading">Preparation</legend>
       <div class="cohri-row" role="group" aria-label="Removal">
         <label class="cohri-option"><input id="removeCaries" class="provided-input" type="checkbox"> Remove caries</label>
         <label class="cohri-option"><input id="removeOldFilling" class="provided-input" type="checkbox"> Remove old filling</label>
@@ -200,16 +204,24 @@
         <label class="cohri-option"><input id="mdBox" class="provided-input" type="radio" name="proximal-preparation" value="box"> M/D box</label>
         <label class="cohri-option"><input id="slotPrep" class="provided-input" type="radio" name="proximal-preparation" value="slot"> Slot prep</label>
       </div>
-    </section>
-    <section class="provided-section" aria-labelledby="restorationHeading">
-      <h3 id="restorationHeading">Restoration</h3>
+    </fieldset>
+    <fieldset id="compositeRestorationSection" class="provided-section" aria-labelledby="restorationHeading" hidden><legend id="restorationHeading">Composite restoration</legend>
+      <div class="cohri-row" role="group" aria-labelledby="matrixSystemLabel">
+        <span id="matrixSystemLabel" class="cohri-label">Matrix system</span>
+        <label class="cohri-option"><input id="matrixNo" class="provided-input" type="radio" name="matrix-used" value="no" aria-keyshortcuts="N"> No</label>
+        <label class="cohri-option"><input id="matrixYes" class="provided-input" type="radio" name="matrix-used" value="yes" aria-controls="matrixChoices" aria-keyshortcuts="Y"> Yes</label>
+        <span id="matrixChoices" class="matrix-choices" hidden>
+        <label class="cohri-option"><input id="matrixPalodent" class="provided-input" type="radio" name="matrix-system" value="Palodent"> Palodent</label>
+        <label class="cohri-option"><input id="matrixTofflemire" class="provided-input" type="radio" name="matrix-system" value="Tofflemire"> Tofflemire</label>
+        </span>
+      </div>
       <div class="cohri-row" role="group" aria-labelledby="glumaLabel">
         <span id="glumaLabel" class="cohri-label">GLUMA desensitizer</span>
         <label class="cohri-option"><input id="glumaNo" class="provided-input" type="radio" name="restoration-gluma" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
         <label class="cohri-option"><input id="glumaYes" class="provided-input" type="radio" name="restoration-gluma" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
       </div>
       <div class="cohri-row" role="group" aria-labelledby="imgiLabel">
-        <span id="imgiLabel" class="cohri-label">IMGI liner</span>
+        <span id="imgiLabel" class="cohri-label">Vitrobond/RMGI liner</span>
         <label class="cohri-option"><input id="imgiNo" class="provided-input" type="radio" name="restoration-imgi" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
         <label class="cohri-option"><input id="imgiYes" class="provided-input" type="radio" name="restoration-imgi" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
       </div>
@@ -223,7 +235,28 @@
         <label class="cohri-option"><input id="compactableNo" class="provided-input" type="radio" name="restoration-compactable" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
         <label class="cohri-option"><input id="compactableYes" class="provided-input" type="radio" name="restoration-compactable" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
       </div>
-    </section>
+    </fieldset>
+    <fieldset id="amalgamRestorationSection" class="provided-section" aria-labelledby="amalgamRestorationHeading" hidden><legend id="amalgamRestorationHeading">Amalgam restoration</legend>
+      <div class="cohri-row" role="group" aria-labelledby="amalgamMatrixLabel">
+        <span id="amalgamMatrixLabel" class="cohri-label">Matrix system</span>
+        <label class="cohri-option"><input id="amalgamMatrixNo" class="provided-input" type="radio" name="amalgamMatrix-used" value="no" aria-keyshortcuts="N"> No</label>
+        <label class="cohri-option"><input id="amalgamMatrixYes" class="provided-input" type="radio" name="amalgamMatrix-used" value="yes" aria-controls="amalgamMatrixChoices" aria-keyshortcuts="Y"> Yes</label>
+        <span id="amalgamMatrixChoices" class="matrix-choices" hidden>
+        <label class="cohri-option"><input id="amalgamMatrixPalodent" class="provided-input" type="radio" name="amalgam-matrix-system" value="Palodent"> Palodent</label>
+        <label class="cohri-option"><input id="amalgamMatrixTofflemire" class="provided-input" type="radio" name="amalgam-matrix-system" value="Tofflemire"> Tofflemire</label>
+        </span>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="amalgamGlumaLabel">
+        <span id="amalgamGlumaLabel" class="cohri-label">GLUMA desensitizer</span>
+        <label class="cohri-option"><input id="amalgamGlumaNo" class="provided-input" type="radio" name="amalgam-gluma" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="amalgamGlumaYes" class="provided-input" type="radio" name="amalgam-gluma" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+      <div class="cohri-row" role="group" aria-labelledby="amalgamImgiLabel">
+        <span id="amalgamImgiLabel" class="cohri-label">Vitrobond/RMGI liner</span>
+        <label class="cohri-option"><input id="amalgamImgiNo" class="provided-input" type="radio" name="amalgam-imgi" value="no" aria-keyshortcuts="N" title="Press N to select this option in the focused line"> No</label>
+        <label class="cohri-option"><input id="amalgamImgiYes" class="provided-input" type="radio" name="amalgam-imgi" value="yes" aria-keyshortcuts="Y" title="Press Y to select this option in the focused line"> Yes</label>
+      </div>
+    </fieldset>
   </section>
   <section class="clinical-panel treatment-provided note-panel" aria-labelledby="noteHeading">
     <h2 id="noteHeading">Note</h2>
@@ -249,7 +282,7 @@
       <button id="confirmClearAll" type="button">Yes, delete all</button>
     </div>
   </dialog>
-  <script src="script.js?v=student-name-1"></script>
+  <script src="script.js?v=cleanup-20261022"></script>
 
 <script>
 // Preserve one line per category without adding horizontal scrolling.

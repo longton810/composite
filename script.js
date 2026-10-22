@@ -414,7 +414,8 @@ function renderFindings() {
     "recurrent caries": "recurrent-caries", "gross caries": "gross-caries", "composite": "composite",
     "amalgam": "amalgam", "sealant": "sealant", "IRM": "irm",
     "wear": "wear", "chipped": "chipped", "abfraction": "abfraction", "erosion": "erosion",
-    "crack line": "crack-line", "broken": "broken"
+    "crack line": "crack-line", "broken": "broken",
+    "pit": "pit", "deep groove": "deep-groove", "overhang": "overhang", "open margin": "open-margin", "short margin": "short-margin", "rest seat": "rest-seat"
   };
   const wholeClasses = {
     "SSC": "ssc", "Zirconia crown": "zirconia-crown", "PFM crown": "pfm-crown",
@@ -676,12 +677,24 @@ function updatePreparationFields() {
   const records = changed ? providedTreatments || [] : findings.filter(record => record.treatment);
   const hasProximal = records.some(record => record.surfaces.some(surface => ["M", "D"].includes(surface)));
   byId("proximalPrep").hidden = !hasProximal;
+  const confirmed = query('input[name="cohri-provided"]:checked')?.value;
+  const provided = confirmed === 'same-as-planned' ? findings.filter(record => record.treatment)
+    : confirmed === 'change' ? providedTreatments || [] : [];
+  byId('compositeRestorationSection').hidden = !provided.some(record => record.finding.toLowerCase() === 'composite');
+  byId('amalgamRestorationSection').hidden = !provided.some(record => record.finding.toLowerCase() === 'amalgam');
 }
 
 byId("providedDetails").addEventListener("input", updatePreparationFields);
 all('input[name="cohri-provided"]').forEach(input => input.addEventListener("change", updatePreparationFields));
 
+function updateMatrixChoices() {
+  ['matrix','amalgamMatrix'].forEach(prefix => {
+    byId(prefix+'Choices').hidden = !byId(prefix+'Yes').checked;
+  });
+}
+
 function updateTreatmentProvidedFields() {
+  updateMatrixChoices();
   byId('noteAssistant').hidden = !byId('noteAssistantEnabled').checked;
   byId("notePreceptorOther").hidden = byId("notePreceptor").value !== "Others";
   ['Codes', 'Swipe'].forEach(role => {
@@ -703,6 +716,10 @@ function readTreatmentProvided() {
 }
 
 function restoreTreatmentProvided(data = {}) {
+  data = {...data};
+  ['matrix','amalgamMatrix'].forEach(prefix => {
+    if (data[prefix+'Yes'] === undefined && data[prefix+'No'] === undefined && (data[prefix+'Palodent'] || data[prefix+'Tofflemire'])) data[prefix+'Yes'] = true;
+  });
   data = { ...data, noteAssistantEnabled: typeof data.noteAssistantEnabled === 'boolean' ? data.noteAssistantEnabled : Boolean(data.noteAssistant?.trim()) };
   all(".provided-input").forEach(input => {
     const saved = data?.[input.id];
@@ -739,6 +756,31 @@ const autosaveMessage = byId("autosaveMessage");
 function orderedSurfaces(surfaces) {
   const order = surfaces.includes("M") ? "MOIDBFLC" : "DOIBFLCM";
   return [...surfaces].sort((a, b) => order.indexOf(a) - order.indexOf(b));
+}
+
+function groupByMaterial(records) {
+  const groups = new Map();
+  records.forEach(record => {
+    const material = record.finding.toLowerCase();
+    if (!groups.has(material)) groups.set(material, []);
+    groups.get(material).push(record);
+  });
+  return groups;
+}
+
+function proximalSurfacesByTooth(records, toothLabel, merge = true) {
+  const result = new Map();
+  records.forEach(record => {
+    const surfaces = record.surfaces.filter(surface => ['M', 'D'].includes(surface));
+    if (!surfaces.length) return;
+    const label = toothLabel(record);
+    result.set(label, merge ? [...new Set([...(result.get(label) || []), ...surfaces])] : surfaces);
+  });
+  return result;
+}
+
+function carpuleDescription(amount, drug) {
+  return `${amount || ""} ${Number(amount) === 1 ? "carpule" : "carpules"} of ${drug}`;
 }
 
 function generateClinicalNote(s) {
@@ -806,52 +848,78 @@ function generateClinicalNote(s) {
         if (p["nerve" + side + i]) locations.push(field(`(${mark}) ${block}${block.endsWith("block") ? "" : " block"}`));
       });
     }
-    anesthesia.push(`${field(`${p.nerveCarpules || ""} carpules of ${drug(s.nerveLA)}`)} was administered via ${sentenceList(locations) || ""}.`);
+    anesthesia.push(`${field(carpuleDescription(p.nerveCarpules, drug(s.nerveLA)))} was administered via ${sentenceList(locations) || ""}.`);
   }
-  if (p.localInfiltration) anesthesia.push(`${p.nerveBlock ? "Then local infiltration" : "Local infiltration"} with ${field(`${p.infiltrationCarpules || ""} carpules of ${drug(s.infiltrationLA)}`)} was administered around the tooth.`);
+  if (p.localInfiltration) anesthesia.push(`${p.nerveBlock ? "Then local infiltration" : "Local infiltration"} with ${field(carpuleDescription(p.infiltrationCarpules, drug(s.infiltrationLA)))} was administered around the tooth.`);
   if (anesthesia.length) lines.push(`${bold("- Anesthesia:")} ${anesthesia.join(" ")}`);
-  if (restorations.length) {
+  const irmRestorations = restorations.filter(record => record.finding.toLowerCase() === 'irm');
+  const definitiveRestorations = restorations.filter(record => record.finding.toLowerCase() !== 'irm');
+  if (definitiveRestorations.length) {
+    const restorations = definitiveRestorations;
     const sites = [...new Set(restorations.map(site))];
-    const prep = [], restoration = [];
+    const prep = [];
     const isolation = p.isolationDam ? "clamps and rubber dam" : p.isolationIsolite ? "Isolite with high volume suction" : p.isolationCotton ? "Dri-angle, throat pack and cotton rolls" : "";
     if (isolation) prep.push(`Isolation was achieved with ${escape(isolation)}.`);
-    const removed = p.removeOldFilling && p.removeCaries ? "the existing restoration and all carious tooth structure" : p.removeOldFilling ? "the existing restoration" : p.removeCaries ? "all carious tooth structure" : "";
-    const technique = p.conventionalPrep ? "Conventional" : p.conservativePrep ? "Conservative" : "";
-    if (technique) prep.push(`${technique} cavity preparation was performed${removed ? ", ensuring complete removal of " + removed : ""}.`);
-    else if (removed) prep.push(`${removed.charAt(0).toUpperCase() + removed.slice(1)} ${p.removeOldFilling && p.removeCaries ? "were" : "was"} completely removed.`);
-    const proximalByTooth = new Map();
-    for (const record of restorations) {
-      const proximal = record.surfaces.filter(surface => ["M", "D"].includes(surface));
-      if (proximal.length) proximalByTooth.set(tooth(record), [...new Set([...(proximalByTooth.get(tooth(record)) || []), ...proximal])]);
-    }
+    prep.push("Access to the carious lesion was established using a high-speed handpiece with 330/245 carbide bur.");
+    if (p.conventionalPrep) prep.push("A conventional cavity preparation was performed, following ideal preparation principles and eliminating all unsupported enamel.");
+    else if (p.conservativePrep) prep.push("Conservative cavity preparation was performed.");
+    const removal = [];
+    if (p.removeOldFilling) removal.push("The existing restoration was completely removed");
+    if (p.removeCaries) removal.push((removal.length ? "all" : "All") + " carious tooth structure was excavated using a slow-speed round burs (RA#2, #4) and spoon excavator, with care taken to preserve sound tooth structure and avoid pulp exposure");
+    if (removal.length) prep.push(removal.join(" and ") + ".");
+    const proximalByTooth = proximalSurfacesByTooth(restorations, tooth);
     for (const [label, surfaces] of proximalByTooth) {
       const proximal = orderedSurfaces(surfaces);
       if (p.mdBox) prep.push(`${proximal.join(" and ")} ${proximal.length > 1 ? "boxes were" : "box was"} created on tooth ${escape(label)}.`);
       if (p.slotPrep) prep.push(`${proximal.join(" and ")} slot preparation was performed on tooth ${escape(label)}.`);
     }
     lines.push(`- ${bold(`Preparation ${sites.join(", ")}`)}: ${prep.join(" ")}`);
-    if (p.glumaYes) restoration.push("GLUMA desensitizer was applied.");
-    const composites = restorations.filter(record => record.finding.toLowerCase() === "composite");
-    const compositeSites = [...new Set(composites.map(site))];
-    if (p.imgiYes) restoration.push("The pulpal floor was lined with IMGI" + (composites.length === restorations.length ? ", and the preparation was etched with 38% phosphoric acid." : "."));
-    if (composites.length) {
-      if (composites.length < restorations.length) restoration.push(`For ${escape(compositeSites.join(", "))}, the preparation was etched with 38% phosphoric acid.`);
-      else if (!p.imgiYes) restoration.push("The preparation was etched with 38% phosphoric acid.");
-      restoration.push("BeautiBond was then applied and light-cured.");
+    for (const [material, records] of groupByMaterial(restorations)) {
+      const restorations = records;
+      const sites = [...new Set(records.map(site))];
+      const restoration = [];
+      const proximalByTooth = proximalSurfacesByTooth(records, tooth, false);
+      const matrixUsed = material === 'amalgam' ? p.amalgamMatrixYes : p.matrixYes;
+      const matrixPalodent = matrixUsed && (material === 'amalgam' ? p.amalgamMatrixPalodent : p.matrixPalodent);
+      const matrixTofflemire = matrixUsed && (material === 'amalgam' ? p.amalgamMatrixTofflemire : p.matrixTofflemire);
+      if (matrixPalodent) restoration.push("A Palodent sectional matrix, wedge, and separation ring were placed to establish proper proximal contour and contact.");
+      else if (matrixTofflemire) restoration.push("A Tofflemire matrix band and wedge were placed to establish proper proximal contour and contact.");
+      if (material === 'amalgam' ? p.amalgamGlumaYes : material === 'composite' && p.glumaYes) restoration.push("GLUMA desensitizer was applied.");
+      if (material === 'amalgam' && p.amalgamImgiYes) restoration.push("The pulpal floor was lined with Vitrobond/RMGI.");
+      const composites = restorations.filter(record => record.finding.toLowerCase() === "composite");
+      const compositeSites = [...new Set(composites.map(site))];
+      if (material === "composite" && p.imgiYes) restoration.push("The pulpal floor was lined with Vitrobond/RMGI" + (composites.length === restorations.length ? ", and the preparation was etched with 38% phosphoric acid." : "."));
+      if (composites.length) {
+        if (composites.length < restorations.length) restoration.push(`For ${escape(compositeSites.join(", "))}, the preparation was etched with 38% phosphoric acid.`);
+        else if (!p.imgiYes) restoration.push("The preparation was etched with 38% phosphoric acid.");
+        restoration.push("BeautiBond was then applied and light-cured.");
+      }
+      if (composites.length) restoration.push(`Shade ${escape(p.providedShade)} was chosen.`);
+      if (composites.length) {
+        const materials = [];
+        if (p.flowableYes) materials.push("flowable");
+        if (p.compactableYes) materials.push("packable");
+        if (materials.length) restoration.push(`${compositeSites.length > 1 ? "The cavities were" : "The cavity was"} restored using ${escape(p.providedShade)} ${materials.join(" and ")} composite resin${composites.length < restorations.length ? " on " + escape(compositeSites.join(", ")) : ""}.`);
+        const occlusalSites = [...new Set(composites.filter(record => record.surfaces.includes("O")).map(site))];
+        if (occlusalSites.length) restoration.push(`The cusps and grooves were carefully reconstructed to replicate the natural tooth anatomy${occlusalSites.length < sites.length ? " on " + escape(occlusalSites.join(", ")) : ""}.`);
+      }
+      if (material === 'amalgam') {
+        restoration.push("Amalgam was triturated, placed, and condensed incrementally into the cavity preparation. The restoration was burnished and carved to reproduce natural tooth anatomy. The matrix and wedge were removed.");
+        restoration.push(p.mdBox && proximalByTooth.size
+          ? "Proximal contact, margins, and occlusion were checked and adjusted as needed."
+          : "Margins and occlusion were checked and adjusted as needed.");
+      } else if (proximalByTooth.size) restoration.push(`The proximal contact${proximalByTooth.size > 1 ? "s" : ""}${proximalByTooth.size < new Set(restorations.map(tooth)).size ? " on " + escape([...proximalByTooth.keys()].join(", ")) : ""}, marginal adaptation, and occlusion were evaluated and adjusted as needed.`);
+      else restoration.push("Marginal adaptation and occlusion were evaluated and adjusted as needed.");
+      if (material !== "amalgam") restoration.push(`${sites.length > 1 ? "The restorations were" : "The restoration was"} finished and polished using BEAM burs with a low-speed handpiece.`);
+      const materialName = records[0].finding;
+      lines.push(`- ${bold(`Restoration ${materialName} ${sites.join(", ")}:`)} ${restoration.join(" ")}`);
     }
-    restoration.push(`Shade ${escape(p.providedShade)} was chosen.`);
-    if (composites.length) {
-      const materials = [];
-      if (p.flowableYes) materials.push("flowable");
-      if (p.compactableYes) materials.push("packable");
-      if (materials.length) restoration.push(`${compositeSites.length > 1 ? "The cavities were" : "The cavity was"} restored using ${escape(p.providedShade)} ${materials.join(" and ")} composite resin${composites.length < restorations.length ? " on " + escape(compositeSites.join(", ")) : ""}.`);
-      const occlusalSites = [...new Set(composites.filter(record => record.surfaces.includes("O")).map(site))];
-      if (occlusalSites.length) restoration.push(`The cusps and grooves were carefully reconstructed to replicate the natural tooth anatomy${occlusalSites.length < sites.length ? " on " + escape(occlusalSites.join(", ")) : ""}.`);
-    }
-    if (proximalByTooth.size) restoration.push(`The proximal contact${proximalByTooth.size > 1 ? "s" : ""}${proximalByTooth.size < new Set(restorations.map(tooth)).size ? " on " + escape([...proximalByTooth.keys()].join(", ")) : ""}, marginal adaptation, and occlusion were evaluated and adjusted as needed.`);
-    else restoration.push("Marginal adaptation and occlusion were evaluated and adjusted as needed.");
-    restoration.push(`${sites.length > 1 ? "The restorations were" : "The restoration was"} finished and polished using BEAM burs with a low-speed handpiece.`);
-    lines.push(`- ${bold(`Restoration ${sites.join(", ")}:`)} ${restoration.join(" ")}`);
+  }
+  if (irmRestorations.length) {
+    const irmSites = [...new Set(irmRestorations.map(site))];
+    lines.push(`- ${bold(`IRM ${irmSites.join(", ")}:`)} Carious tooth structure was removed as indicated. The cavity was rinsed and gently dried. IRM was mixed according to the manufacturer's instructions, placed into the cavity, and adapted to the cavity walls and margins. Excess material was removed, and the restoration was contoured to reproduce natural tooth anatomy. After setting, occlusion was checked and adjusted as needed.`);
+  }
+  if (restorations.length) {
     lines.push("", "Postoperative instructions were provided, including avoiding chewing until anesthesia wears off, maintaining oral hygiene, and expecting temporary sensitivity. The patient was advised to contact the clinic for a high bite, persistent sensitivity, or worsening pain.");
   }
   const rolePreceptor = role => p['note'+role+'Preceptor'] === 'Others'
@@ -1091,15 +1159,14 @@ document.addEventListener("keydown", event => {
   advanceFormLine(input);
 });
 
-['Codes', 'Swipe'].forEach(role => {
-  byId('note'+role+'Preceptor').addEventListener('change', () => {
-    if (byId('note'+role+'Preceptor').value === 'Others') byId('note'+role+'Other').focus();
+['', 'Codes', 'Swipe'].forEach(role => {
+  const prefix = 'note' + role;
+  byId(prefix+'Preceptor').addEventListener('change', () => {
+    if (byId(prefix+'Preceptor').value === 'Others') byId(role ? prefix+'Other' : 'notePreceptorOther').focus();
   });
 });
 byId('generatedNote').addEventListener('animationend', event => {
   if (event.animationName === 'note-copy-blink') byId('generatedNote').classList.remove('note-copy-blink');
 });
 
-byId('notePreceptor').addEventListener('change', () => {
-  if (byId('notePreceptor').value === 'Others') byId('notePreceptorOther').focus();
-});
+
