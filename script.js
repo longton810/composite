@@ -889,10 +889,10 @@ function generateClinicalNote(s) {
       if (material === 'amalgam' && p.amalgamImgiYes) restoration.push("The pulpal floor was lined with Vitrobond/RMGI.");
       const composites = restorations.filter(record => record.finding.toLowerCase() === "composite");
       const compositeSites = [...new Set(composites.map(site))];
-      if (material === "composite" && p.imgiYes) restoration.push("The pulpal floor was lined with Vitrobond/RMGI" + (composites.length === restorations.length ? ", and the preparation was etched with 38% phosphoric acid." : "."));
+      if (material === "composite" && p.imgiYes) restoration.push("The pulpal floor was lined with Vitrobond/RMGI" + (composites.length === restorations.length ? ", and the preparation was etched with 37% phosphoric acid." : "."));
       if (composites.length) {
-        if (composites.length < restorations.length) restoration.push(`For ${escape(compositeSites.join(", "))}, the preparation was etched with 38% phosphoric acid.`);
-        else if (!p.imgiYes) restoration.push("The preparation was etched with 38% phosphoric acid.");
+        if (composites.length < restorations.length) restoration.push(`For ${escape(compositeSites.join(", "))}, the preparation was etched with 37% phosphoric acid.`);
+        else if (!p.imgiYes) restoration.push("The preparation was etched with 37% phosphoric acid.");
         restoration.push("BeautiBond was then applied and light-cured.");
       }
       if (composites.length) restoration.push(`Shade ${escape(p.providedShade)} was chosen.`);
