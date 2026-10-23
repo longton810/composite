@@ -90,7 +90,7 @@ function createTooth(toothNumber) {
     <text x="97" y="65">${rightSurface}</text>
     <text x="60" y="103">${bottomSurface}</text>
     <rect class="surface cervical-surface" data-surface="C" x="15" y="135" width="90" height="40" rx="3" ></rect>
-    <text class="cervical-label" x="60" y="155" >C</text>
+    <text class="cervical-label" x="60" y="155" >cervical</text>
     <g class="lengthening-arrows">
     <path d="M35 181 V197 M29 191 L35 197 L41 191" ></path>
     <path d="M60 181 V197 M54 191 L60 197 L66 191" ></path>
@@ -426,7 +426,7 @@ function renderFindings() {
   const crownFindings = [ "SSC", "Zirconia crown", "PFM crown", "Metal crown", "implant" ];
   const crownTreatments = [ "CBU", "SSC", "Zirconia", "PFM", "Metal", "Bridge", "bridge", "Implant", "implant" ];
   const fillingTreatments = [ "Composite", "Amalgam", "RMGI", "IRM", "Sealant" ];
-  all(".cervical-label").forEach( label => { label.textContent = "C"; });
+  all(".cervical-label").forEach( label => { label.textContent = "cervical"; });
   all(".root-markers").forEach( marker => { marker.innerHTML = ""; });
   all(".surface").forEach( surface => {
     surface.classList.remove( ...new Set(Object.values(surfaceClasses)) );
